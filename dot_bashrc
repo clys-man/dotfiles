@@ -1,0 +1,17 @@
+[[ $- != *i* ]] && return
+
+export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+
+case ":$PATH:" in
+	*":$HOME/.local/bin:"*) ;;
+	*) export PATH="$HOME/.local/bin:$PATH" ;;
+esac
+
+alias ls='ls --color=auto'
+alias grep='grep --color=auto'
+
+[[ -f "$HOME/.cargo/env" ]] && source "$HOME/.cargo/env"
+
+export NVM_DIR="$HOME/.nvm"
+[[ -s "$NVM_DIR/nvm.sh" ]] && source "$NVM_DIR/nvm.sh"
+[[ -s "$NVM_DIR/bash_completion" ]] && source "$NVM_DIR/bash_completion"
