@@ -32,8 +32,6 @@ alias lg='lazygit'
 alias cat='bat'
 alias grep='grep --color=auto'
 
-[[ -f "$HOME/.fzf.zsh" ]] && source "$HOME/.fzf.zsh"
-
 ZINIT_HOME="$HOME/.local/share/zinit/zinit.git"
 if [[ ! -f "$ZINIT_HOME/zinit.zsh" ]]; then
 	print -P "%F{33}Installing zinit...%f"
@@ -57,7 +55,3 @@ zinit light zsh-users/zsh-syntax-highlighting
 
 eval "$(starship init zsh)"
 eval "$("$HOME/.local/bin/mise" activate zsh)"
-
-export NVM_DIR="$XDG_CONFIG_HOME/nvm"
-[[ -s "$NVM_DIR/nvm.sh" ]] && source "$NVM_DIR/nvm.sh"
-[[ -s "$NVM_DIR/bash_completion" ]] && source "$NVM_DIR/bash_completion"
