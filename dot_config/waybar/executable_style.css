@@ -19,7 +19,7 @@ window#waybar {
   border-radius: 1rem;
   margin: 5px 0;
   background-color: @surface0;
-  margin-left: 1rem;
+  margin-left: 0.35rem;
 }
 
 #workspaces button {
@@ -27,8 +27,17 @@ window#waybar {
   border-radius: 1rem;
 }
 
+#workspaces button label {
+  margin-top: 1px;
+}
+
+#workspaces button.active label {
+  margin-left: -5px;
+}
+
 #workspaces button.active {
-  color: @text;
+  color: @base;
+  background: @accent;
   border-radius: 1rem;
 }
 
@@ -70,15 +79,15 @@ window#waybar {
 }
 
 #taskbar button.active {
-  background: @overlay0;
-  color: @text;
+  background: @accent;
+  color: @base;
   animation: gradient_f 20s ease-in infinite;
   transition: all 0.3s cubic-bezier(0.55, -0.68, 0.48, 1.682);
 }
 
 #taskbar button:hover {
-  background: @overlay0;
-  color: @text;
+  background: @accent;
+  color: @base;
   animation: gradient_f 20s ease-in infinite;
   transition: all 0.3s cubic-bezier(0.55, -0.68, 0.48, 1.682);
 }
@@ -152,8 +161,9 @@ window#waybar {
 }
 
 #custom-launcher {
-  color: @blue;
-  font-size: 14px;
+  color: @accent;
+  font-size: 18px;
+  padding: 0 0.9rem 0 0.8rem;
 }
 
 #custom-playerctl {

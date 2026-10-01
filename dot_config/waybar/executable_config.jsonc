@@ -8,7 +8,7 @@
   "margin-right": 0,
   "modules-left": [
     "custom/launcher",
-    "ext/workspaces",
+    "hyprland/workspaces",
     "custom/playerctl",
     "custom/playerlabel"
   ],
@@ -65,13 +65,20 @@
       "Alacritty"
     ]
   },
-  "ext/workspaces": {
+  "hyprland/workspaces": {
     "active-only": false,
-    "all-outputs": true,
+    "all-outputs": false,
+    "persistent-workspaces": {
+      "1": [],
+      "2": [],
+      "3": [],
+      "4": [],
+      "5": []
+    },
     "on-scroll-up": "hyprctl dispatch 'hl.dsp.focus({workspace=\"e+1\"})'",
     "on-scroll-down": "hyprctl dispatch 'hl.dsp.focus({workspace=\"e-1\"})'",
     "format": "{icon}",
-    "sort-by-id": true,
+    "sort-by": "number",
     "on-click": "activate",
     "format-icons": {
       "urgent": "",
@@ -115,6 +122,8 @@
     "format-charging": " {capacity}%",
     "format-plugged": " {capacity}%",
     "format-alt": "{time} {icon}",
+    "tooltip-format": "{timeTo}\nClick: cycle power profile",
+    "on-click": "bash ~/.config/waybar/scripts/power-profile.sh",
     "format-icons": [
       "󰂎",
       "󰁺",
@@ -177,8 +186,8 @@
       "",
       ""
     ],
-    "on-scroll-up": "bash ~/.scripts/brightness --inc",
-    "on-scroll-down": "bash ~/.scripts/brightness --dec",
+    "on-scroll-up": "brightnessctl -e4 -n2 set 5%+",
+    "on-scroll-down": "brightnessctl -e4 -n2 set 5%-",
     "min-length": 6
   },
   "pulseaudio": {
@@ -217,7 +226,6 @@
   "custom/gammastep": {
     "format": "{}",
     "interval": 5,
-    "on-update": "",
     "exec": "sleep 0.05; bash ~/.config/waybar/scripts/gammastep.sh",
     "on-click": "bash ~/.config/waybar/scripts/gammastep.sh toggle"
   },

@@ -1,0 +1,231 @@
+{
+  // =============================
+  // Editor Configuration
+  // =============================
+  "editor.semanticHighlighting.enabled": true,
+  "editor.fontSize": 14,
+  "editor.fontFamily": "MesloLGS NF",
+  "editor.fontWeight": "bold",
+  "editor.lineHeight": 26,
+  "editor.rulers": [80, 120],
+  "editor.wordWrap": "on",
+  "editor.linkedEditing": true,
+  "editor.tabSize": 4,
+  "editor.cursorBlinking": "smooth",
+  "editor.cursorSmoothCaretAnimation": "on",
+  "editor.smoothScrolling": true,
+  "editor.minimap.enabled": false,
+  "editor.padding": {
+    "top": 30,
+    "bottom": 30,
+  },
+  "editor.parameterHints.enabled": false,
+  "editor.acceptSuggestionOnCommitCharacter": false,
+  "editor.renderLineHighlight": "gutter",
+  "editor.suggestSelection": "first",
+  "editor.inlineSuggest.enabled": true,
+  "editor.inlineSuggest.showToolbar": "never",
+  "editor.codeLens": false,
+  "editor.links": false,
+  "editor.multiCursorModifier": "ctrlCmd",
+  "editor.detectIndentation": false,
+  "editor.copyWithSyntaxHighlighting": false,
+  "editor.emptySelectionClipboard": false,
+  "editor.snippetSuggestions": "top",
+  "editor.fastScrollSensitivity": 5,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.addMissingImports": "explicit",
+  },
+  "editor.formatOnSave": true,
+
+  // =============================
+  // Workbench Configuration
+  // =============================
+  "workbench.colorTheme": "Catppuccin Mocha",
+  "catppuccin.accentColor": "blue",
+  "catppuccin.customUIColors": {
+    "mocha": {
+      "statusBar.foreground": "accent",
+    },
+  },
+  "workbench.tree.indent": 12,
+  "workbench.tree.enableStickyScroll": false,
+  "workbench.sideBar.location": "left",
+  "workbench.editor.enablePreview": false,
+  "window.openFoldersInNewWindow": "off",
+  "window.openFilesInNewWindow": "off",
+  "window.newWindowDimensions": "inherit",
+
+  // =============================
+  // File Management
+  // =============================
+  "files.autoSave": "afterDelay",
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "files.trimFinalNewlines": true,
+  "files.exclude": {
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+  },
+  "files.associations": {
+    ".sequelizerc": "javascript",
+    ".stylelintrc": "json",
+    "*.tsx": "typescriptreact",
+    ".env.*": "dotenv",
+    ".prettierrc": "json",
+    ".php_cs": "php",
+    "artisan": "php",
+    ".php_cs.dist": "php",
+  },
+
+  // =============================
+  // Terminal Configuration
+  // =============================
+  "terminal.integrated.minimumContrastRatio": 1,
+  "terminal.integrated.detectLocale": "on",
+  "terminal.integrated.tabs.enabled": true,
+  "terminal.integrated.showExitAlert": false,
+  "terminal.integrated.ignoreProcessNames": ["starship", "oh-my-posh", "zsh"],
+  "terminal.integrated.cursorStyle": "line",
+  "terminal.integrated.defaultProfile.linux": "zsh",
+  "terminal.integrated.fontFamily": "MesloLGS NF",
+  "terminal.integrated.fontWeightBold": "bold",
+  "terminal.integrated.fontWeight": "bold",
+  "terminal.integrated.mouseWheelZoom": true,
+
+  // =============================
+  // Language-specific Settings
+  // =============================
+  "[javascript]": {
+    "editor.formatOnSave": false,
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": "explicit",
+    },
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+  },
+  "javascript.suggest.autoImports": true,
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "[typescript]": {
+    "editor.formatOnSave": false,
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": "explicit",
+    },
+  },
+  "typescript.tsserver.log": "verbose",
+  "typescript.suggest.autoImports": true,
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "[json]": {
+    "editor.defaultFormatter": "vscode.json-language-features",
+  },
+  "[php]": {
+    "editor.defaultFormatter": "bmewburn.vscode-intelephense-client",
+  },
+
+  // =============================
+  // Git & GitHub Configuration
+  // =============================
+  "git.autofetch": true,
+  "git.confirmSync": false,
+  "git.enableSmartCommit": true,
+  "git.ignoreMissingGitWarning": true,
+  "git.openRepositoryInParentFolders": "never",
+  "github.copilot.enable": {
+    "*": true,
+    "yaml": true,
+    "plaintext": false,
+    "markdown": true,
+  },
+  "githubPullRequests.pullBranch": "never",
+  "github.copilot.editor.enableAutoCompletions": true,
+
+  // =============================
+  // Tailwind CSS Configuration
+  // =============================
+  "tailwindCSS.includeLanguages": {
+    "plaintext": "html",
+  },
+  "tailwindCSS.emmetCompletions": true,
+  "tailwindCSS.colorDecorators": true,
+  "tailwindCSS.validate": true,
+  "tailwindCSS.experimental.classRegex": [
+    ["tv\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
+  ],
+
+  // =============================
+  // Vim Configuration
+  // =============================
+  "vim.easymotion": true,
+  "vim.incsearch": true,
+  "vim.useSystemClipboard": true,
+  "vim.useCtrlKeys": true,
+  "vim.smartcase": true,
+  "vim.ignorecase": true,
+  "extensions.experimental.affinity": {
+    "vscodevim.vim": 1,
+  },
+  "vim.normalModeKeyBindings": [
+    { "before": ["E"], "after": ["$"] },
+    { "before": ["B"], "after": ["^"] },
+    { "before": ["<Esc>"], "command": [":nohlsearch<CR>"] },
+  ],
+  "vim.visualModeKeyBindings": [
+    { "before": ["E"], "after": ["$"] },
+    { "before": ["B"], "after": ["^"] },
+  ],
+
+  // =============================
+  // Noise Configuration
+  // =============================
+  "editor.stickyScroll.enabled": false,
+  "workbench.tree.renderIndentGuides": "none",
+  "window.title": " ",
+  "workbench.editor.editorActionsLocation": "hidden",
+  "workbench.layoutControl.enabled": false,
+  "editor.showFoldingControls": "never",
+  "editor.guides.indentation": false,
+  "terminal.integrated.gpuAcceleration": "on",
+  "editor.scrollbar.vertical": "hidden",
+  "editor.scrollbar.horizontal": "hidden",
+  "workbench.editor.labelFormat": "short",
+  "workbench.editor.showTabs": "none",
+  "window.commandCenter": false,
+  "breadcrumbs.enabled": false,
+  "scm.diffDecorations": "none",
+  "editor.hover.enabled": "off",
+  "editor.matchBrackets": "never",
+  "workbench.tips.enabled": false,
+  "editor.colorDecorators": false,
+  "git.decorations.enabled": false,
+  "editor.lightbulb.enabled": "off",
+  "editor.selectionHighlight": false,
+  "editor.overviewRulerBorder": false,
+  "editor.occurrencesHighlight": "off",
+  "problems.decorations.enabled": false,
+  "editor.renderControlCharacters": false,
+  "editor.hideCursorInOverviewRuler": true,
+  "editor.gotoLocation.multipleReferences": "goto",
+  "editor.gotoLocation.multipleDefinitions": "goto",
+  "editor.gotoLocation.multipleDeclarations": "goto",
+  "workbench.editor.enablePreviewFromQuickOpen": false,
+  "editor.gotoLocation.multipleImplementations": "goto",
+  "editor.gotoLocation.multipleTypeDefinitions": "goto",
+  "pgsql.serverGroups": [
+    {
+      "name": "Servers",
+      "id": "41D55AAB-C093-4BD7-A6D5-3A2C25F79F2B",
+      "isDefault": true,
+    },
+  ],
+  "github.copilot.nextEditSuggestions.enabled": true,
+  "workbench.editorAssociations": {
+    "*.copilotmd": "vscode.markdown.preview.editor",
+    "*.csv": "default",
+  },
+  "gitlens.ai.model": "vscode",
+  "gitlens.ai.vscode.model": "copilot:gpt-4.1",
+  "workbench.startupEditor": "none",
+  "chat.viewSessions.orientation": "stacked",
+}

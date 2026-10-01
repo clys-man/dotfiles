@@ -1,0 +1,12 @@
+set -eu
+python3 - <<'PY'
+import os
+from pathlib import Path
+state = Path(os.environ.get('XDG_STATE_HOME', Path.home() / '.local/state')) / 'quickshell'
+state.mkdir(parents=True, exist_ok=True)
+file = state / 'notifications.json'
+if not file.exists():
+    file.write_text('{"doNotDisturb":false,"entries":[]}')
+PY
+systemctl --user stop swaync.service
+exec qs -p {{ .chezmoi.homeDir }}/.config/quickshell -n -d

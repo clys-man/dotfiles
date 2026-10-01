@@ -1,1 +1,4 @@
 . "$HOME/.cargo/env"
+eval "$("$HOME/.local/bin/mise" activate zsh --shims)"
+
+export SSL_CERT_DIR="$HOME/.aspnet/dev-certs/trust:/etc/ssl/certs"

@@ -1,0 +1,18 @@
+profile portable {
+    output DP-1 enable mode 1920x1080 position 0,0 scale 1
+    output eDP-1 enable mode 1920x1080 position 1920,0 scale 1
+}
+
+profile ncdia {
+    output eDP-1 disable
+    output "AOC 2270W GEFI2XA005490" enable mode 1920x1080 position 0,0 scale 1
+}
+
+#profile ncdia {
+#    output "AOC 2270W GEFI2XA005490" enable mode 1920x1080 position 0,0 scale 1
+#    output eDP-1 enable mode 1920x1080 position 0,1080 scale 1
+#}
+
+profile laptop {
+    output eDP-1 enable mode 1920x1080 position 0,0 scale 1
+}
