@@ -20,13 +20,32 @@ RowLayout {
             PanelLabel { Layout.fillWidth: true; text: "Notifications"; font.pixelSize: 15; font.bold: true }
             PanelAction { text: "Clear"; enabled: center.store.count > 0; onClicked: center.store.clear() }
         }
-        ScrollView {
+        Flickable {
+            id: notificationScroll
             Layout.fillWidth: true
             Layout.fillHeight: true
-            contentWidth: availableWidth
+            Layout.minimumHeight: 0
+            contentWidth: width
+            contentHeight: notificationList.implicitHeight
+            flickableDirection: Flickable.VerticalFlick
+            boundsBehavior: Flickable.StopAtBounds
             clip: true
+            ScrollBar.vertical: ScrollBar {
+                id: notificationBar
+                policy: ScrollBar.AsNeeded
+                active: true
+                width: 6
+                contentItem: Rectangle {
+                    implicitWidth: 6
+                    implicitHeight: 30
+                    radius: 3
+                    color: notificationBar.pressed ? "#89b4fa" : "#585b70"
+                }
+                background: Rectangle { color: "transparent" }
+            }
             ColumnLayout {
-                width: parent.width
+                id: notificationList
+                width: notificationScroll.width - (notificationBar.visible ? 14 : 0)
                 spacing: 8
                 Repeater {
                     model: center.store.entries.filter(e => !e.transient)
