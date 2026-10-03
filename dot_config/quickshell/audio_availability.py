@@ -1,6 +1,7 @@
 import json
 import re
 import subprocess
+import sys
 from pathlib import Path
 
 
@@ -59,8 +60,15 @@ def available_outputs():
     return [sink['name'] for sink in json.loads(result.stdout) if sink_available(sink)]
 
 
+def available_inputs():
+    result = subprocess.run(['pactl', '--format=json', 'list', 'sources'], check=True, capture_output=True, text=True)
+    return [{'name': source['name'], 'description': source.get('description') or source['name']}
+            for source in json.loads(result.stdout)
+            if not source['name'].endswith('.monitor') and sink_available(source)]
+
+
 if __name__ == '__main__':
     try:
-        print(json.dumps(available_outputs()), flush=True)
+        print(json.dumps(available_inputs() if '--inputs' in sys.argv else available_outputs()), flush=True)
     except (subprocess.CalledProcessError, ValueError, KeyError, OSError):
         print('[]', flush=True)

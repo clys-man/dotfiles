@@ -10,6 +10,7 @@ ColumnLayout {
     readonly property var sink: Pipewire.defaultAudioSink
     readonly property var source: Pipewire.defaultAudioSource
     property var availableOutputs: []
+    property var inputs: []
     readonly property var outputs: Pipewire.nodes.values.filter(n => n.isSink && !n.isStream && n.audio && availableOutputs.indexOf(n.name) >= 0)
     Process {
         id: availability
@@ -22,7 +23,27 @@ ColumnLayout {
             }
         }
     }
-    Timer { interval: 2000; running: true; repeat: true; onTriggered: { if (!availability.running) availability.running = true; } }
+    Process {
+        id: inputAvailability
+        command: ["python3", Quickshell.shellPath("audio_availability.py"), "--inputs"]
+        running: true
+        stdout: SplitParser {
+            onRead: data => {
+                try { audio.inputs = JSON.parse(data); }
+                catch (error) { audio.inputs = []; }
+            }
+        }
+    }
+    Timer { interval: 2000; running: true; repeat: true; onTriggered: { if (!availability.running) availability.running = true; if (!inputAvailability.running) inputAvailability.running = true; } }
+    property string inputError: ""
+    Process {
+        id: changeInput
+        property string targetName: ""
+        command: ["python3", Quickshell.shellPath("audio-input.py"), targetName]
+        onExited: (exitCode, exitStatus) => {
+            if (exitCode !== 0) audio.inputError = "Could not switch audio input.";
+        }
+    }
     property string outputError: ""
     Process {
         id: changeOutput
@@ -59,11 +80,29 @@ ColumnLayout {
     }
     PanelLabel { visible: audio.outputError.length > 0; Layout.fillWidth: true; text: audio.outputError; color: "#f38ba8" }
     Rectangle { Layout.fillWidth: true; height: 1; color: "#313244" }
-    PanelLabel { text: "Microphone"; color: "#a6adc8" }
+    PanelLabel { text: "Audio input"; color: "#a6adc8" }
     RowLayout {
         Layout.fillWidth: true
         PanelSlider { Layout.fillWidth: true; enabled: !!audio.source && !!audio.source.audio; value: audio.source && audio.source.audio ? audio.source.audio.volume * 100 : 0; onMoved: audio.source.audio.volume = value / 100 }
         PanelLabel { Layout.minimumWidth: 42; Layout.preferredWidth: 42; Layout.maximumWidth: 42; horizontalAlignment: Text.AlignRight; text: audio.source && audio.source.audio ? Math.round(audio.source.audio.volume * 100) + "%" : "—" }
         AudioToggle { Layout.leftMargin: 6; microphone: true; muted: !!audio.source && !!audio.source.audio && audio.source.audio.muted; enabled: !!audio.source && !!audio.source.audio; onClicked: audio.source.audio.muted = !audio.source.audio.muted }
     }
+    Repeater {
+        model: audio.inputs
+        PanelAction {
+            required property var modelData
+            Layout.fillWidth: true
+            iconName: audio.source && audio.source.name === modelData.name ? "check" : ""
+            text: modelData.description
+            accent: !!audio.source && audio.source.name === modelData.name
+            enabled: !changeInput.running
+            onClicked: {
+                audio.inputError = "";
+                changeInput.targetName = modelData.name;
+                changeInput.running = true;
+            }
+        }
+    }
+    PanelLabel { visible: audio.inputs.length === 0; text: "No audio inputs available."; color: "#9399b2" }
+    PanelLabel { visible: audio.inputError.length > 0; Layout.fillWidth: true; text: audio.inputError; color: "#f38ba8" }
 }

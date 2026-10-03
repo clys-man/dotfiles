@@ -243,7 +243,7 @@ hl.config({
 
 hl.config({
 	input = {
-		kb_layout = "br",
+		kb_layout = "br,us",
 		kb_variant = "",
 		kb_model = "",
 		kb_options = "",
@@ -308,6 +308,7 @@ end
 hl.bind(mainMod .. " + CTRL + ALT + D", hl.dsp.exec_cmd("qs ipc -p {{ .chezmoi.homeDir }}/.config/quickshell call bar openFocused calendar"))
 hl.bind(mainMod .. " + X", hl.dsp.exec_cmd("wlogout"))
 hl.bind(mainMod .. " + SPACE", hl.dsp.exec_cmd(menu))
+hl.bind(mainModShift .. " + SPACE", hl.dsp.exec_cmd("hyprctl switchxkblayout all next"))
 hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
 hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit")) -- dwindle only
 hl.bind(mainModShiftAlt .. " + P", hl.dsp.exec_cmd("shutdown -h now"))

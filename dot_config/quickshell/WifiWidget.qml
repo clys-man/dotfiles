@@ -8,7 +8,35 @@ import Quickshell.Io
 ColumnLayout {
     id: wifi
     required property var app
+    property bool detailsExpanded: false
     property var connectionInfo: []
+    property var vpnConnections: []
+    property string vpnError: ""
+    Process {
+        id: vpnStatus
+        command: ["python3", "-B", Quickshell.shellPath("vpn-info.py")]
+        running: true
+        stdout: SplitParser {
+            onRead: data => {
+                try {
+                    const result = JSON.parse(data);
+                    wifi.vpnConnections = result.connections;
+                    if (result.error) wifi.vpnError = result.error;
+                } catch (error) { wifi.vpnError = "Could not check VPN connections."; }
+            }
+        }
+    }
+    Process {
+        id: vpnChange
+        property string uuid: ""
+        property bool connectVpn: false
+        command: ["nmcli", "--wait", "20", "connection", connectVpn ? "up" : "down", "uuid", uuid]
+        stderr: StdioCollector { onStreamFinished: { if (text.trim()) wifi.vpnError = text.trim(); } }
+        onExited: (code, status) => {
+            if (code !== 0 && !wifi.vpnError) wifi.vpnError = "Could not change VPN connection.";
+            if (!vpnStatus.running) vpnStatus.running = true;
+        }
+    }
     readonly property var connectedInfo: connectionInfo.filter(info => devices.concat(wiredDevices).some(device => device.connected && device.name === info.interface))
     Process {
         id: addresses
@@ -21,12 +49,12 @@ ColumnLayout {
             }
         }
     }
-    Timer { interval: 3000; running: true; repeat: true; onTriggered: { if (!addresses.running) addresses.running = true; } }
+    Timer { interval: 3000; running: true; repeat: true; onTriggered: { if (!addresses.running) addresses.running = true; if (!vpnStatus.running) vpnStatus.running = true; } }
     property var selected: null
     property string message: ""
     readonly property var devices: Networking.devices.values.filter(d => d.type === DeviceType.Wifi)
     readonly property var wiredDevices: Networking.devices.values.filter(d => d.type === DeviceType.Wired)
-    readonly property var networks: devices.reduce((all, d) => all.concat(d.networks.values), []).sort((a, b) => Number(b.connected) - Number(a.connected) || b.signalStrength - a.signalStrength)
+    readonly property var networks: devices.reduce((all, d) => all.concat(d.networks.values), []).sort((a, b) => Number(b.connected) - Number(a.connected) || Number(b.known) - Number(a.known) || b.signalStrength - a.signalStrength)
     spacing: 12
     function usesPassword(n) { return [WifiSecurityType.WpaPsk, WifiSecurityType.Wpa2Psk, WifiSecurityType.Sae].indexOf(n.security) >= 0; }
     function choose(n) {
@@ -50,7 +78,7 @@ ColumnLayout {
         function onConnectionFailed(reason) { wifi.message = "Could not connect. Check the password and try again."; }
         function onConnectedChanged() { if (wifi.selected && wifi.selected.connected) { wifi.message = ""; wifi.selected = null; } }
     }
-    PanelLabel { visible: wifi.wiredDevices.length > 0; text: "Wired connection"; color: "#a6adc8" }
+    PanelLabel { visible: wifi.wiredDevices.length > 0; text: "Ethernet"; color: "#a6adc8" }
     Repeater {
         model: wifi.wiredDevices
         Rectangle {
@@ -73,13 +101,13 @@ ColumnLayout {
                         Layout.fillWidth: true
                         font.pixelSize: 10
                         color: "#9399b2"
-                        text: wired.modelData.name + " · " + (wired.modelData.connected ? "Connected" : wired.modelData.hasLink ? "Disconnected" : "Cable unplugged") + (wired.modelData.hasLink && wired.modelData.linkSpeed ? " · " + wired.modelData.linkSpeed + " Mbps" : "")
+                        text: wired.modelData.name + (wired.modelData.hasLink && wired.modelData.linkSpeed ? " · " + wired.modelData.linkSpeed + " Mbps" : "")
                     }
                 }
                 PanelSwitch {
                     checked: wired.modelData.connected
                     enabled: wired.modelData.hasLink && !(wired.modelData.network && wired.modelData.network.stateChanging)
-                    Accessible.name: "Wired connection " + wired.modelData.name
+                    Accessible.name: "Ethernet " + wired.modelData.name
                     onToggled: {
                         if (!checked) wired.modelData.disconnect();
                         else if (wired.modelData.network) wired.modelData.network.connect();
@@ -129,7 +157,7 @@ ColumnLayout {
                             Layout.fillWidth: true
                             spacing: 2
                             PanelLabel { Layout.fillWidth: true; text: row.modelData.name || "Hidden network"; elide: Text.ElideRight; wrapMode: Text.NoWrap }
-                            PanelLabel { visible: row.modelData.stateChanging || row.modelData.connected || row.modelData.known; Layout.fillWidth: true; font.pixelSize: 10; color: "#9399b2"; text: row.modelData.stateChanging ? "Connecting…" : row.modelData.connected ? "Connected · click to disconnect" : row.modelData.known ? "Saved" : "" }
+                            PanelLabel { visible: row.modelData.stateChanging || row.modelData.connected || row.modelData.known; Layout.fillWidth: true; font.pixelSize: 10; color: "#9399b2"; text: row.modelData.stateChanging ? "Connecting…" : row.modelData.connected ? "Connected" : row.modelData.known ? "Saved" : "" }
                         }
                         Icon { name: row.modelData.connected ? "check" : "chevron-right"; color: "#a6e3a1" }
                     }
@@ -140,13 +168,76 @@ ColumnLayout {
         }
     }
     ColumnLayout {
-        visible: wifi.connectedInfo.length > 0
+        Layout.fillWidth: true
+        spacing: 8
+        Rectangle { Layout.fillWidth: true; height: 1; color: "#313244" }
+        PanelLabel { text: "VPN"; color: "#a6adc8" }
+        Repeater {
+            model: wifi.vpnConnections
+            Rectangle {
+                id: vpnRow
+                required property var modelData
+                Layout.fillWidth: true
+                implicitHeight: 64
+                radius: 10
+                color: "#313244"
+                RowLayout {
+                    anchors.fill: parent
+                    anchors.margins: 10
+                    spacing: 10
+                    Icon { name: "shield"; size: 19; color: vpnRow.modelData.active ? "#a6e3a1" : "#9399b2" }
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        spacing: 2
+                        PanelLabel { Layout.fillWidth: true; text: vpnRow.modelData.name; elide: Text.ElideRight; wrapMode: Text.NoWrap }
+                    }
+                    PanelSwitch {
+                        checked: vpnRow.modelData.active
+                        enabled: !vpnChange.running
+                        Accessible.name: "VPN " + vpnRow.modelData.name
+                        onToggled: {
+                            wifi.vpnError = "";
+                            vpnChange.uuid = vpnRow.modelData.uuid;
+                            vpnChange.connectVpn = checked;
+                            vpnChange.running = true;
+                        }
+                    }
+                }
+            }
+        }
+        PanelLabel { visible: wifi.vpnConnections.length === 0; Layout.fillWidth: true; text: "No VPN configured in NetworkManager."; color: "#9399b2" }
+        PanelLabel { visible: wifi.vpnError.length > 0; Layout.fillWidth: true; text: wifi.vpnError; color: "#f38ba8" }
+    }
+    ColumnLayout {
+        visible: wifi.connectedInfo.length > 0 || wifi.vpnConnections.some(vpn => vpn.active)
         Layout.fillWidth: true
         spacing: 10
         Rectangle { Layout.fillWidth: true; height: 1; color: "#313244" }
-        PanelLabel { text: "Connection details"; color: "#a6adc8" }
+        PanelAction {
+            Layout.fillWidth: true
+            text: "Connection details"
+            trailingIconName: wifi.detailsExpanded ? "chevron-down" : "chevron-right"
+            Accessible.name: wifi.detailsExpanded ? "Collapse connection details" : "Expand connection details"
+            onClicked: wifi.detailsExpanded = !wifi.detailsExpanded
+        }
         Repeater {
-            model: wifi.connectedInfo
+            model: wifi.detailsExpanded ? wifi.vpnConnections.filter(vpn => vpn.active && !!vpn.details) : []
+            ColumnLayout {
+                required property var modelData
+                readonly property var details: modelData.details || ({interface: [], ipv4: [], ipv6: [], gateway: [], dns: [], error: ""})
+                Layout.fillWidth: true
+                spacing: 4
+                PanelLabel { Layout.fillWidth: true; text: "VPN · " + parent.modelData.name; font.bold: true; font.pixelSize: 12 }
+                PanelLabel { Layout.fillWidth: true; visible: parent.details.interface.length > 0; text: "Interface: " + parent.details.interface.join(", "); font.pixelSize: 11 }
+                PanelLabel { Layout.fillWidth: true; visible: parent.details.ipv4.length > 0; text: "IPv4: " + parent.details.ipv4.join(", "); font.pixelSize: 11 }
+                PanelLabel { Layout.fillWidth: true; visible: parent.details.ipv6.length > 0; text: "IPv6: " + parent.details.ipv6.join(", "); font.pixelSize: 11 }
+                PanelLabel { Layout.fillWidth: true; visible: parent.details.gateway.length > 0; text: "Gateway: " + parent.details.gateway.join(", "); font.pixelSize: 11 }
+                PanelLabel { Layout.fillWidth: true; visible: parent.details.dns.length > 0; text: "DNS: " + parent.details.dns.join(", "); font.pixelSize: 11 }
+                PanelLabel { Layout.fillWidth: true; visible: parent.details.error.length > 0; text: parent.details.error; font.pixelSize: 11; color: "#f38ba8" }
+            }
+        }
+        Repeater {
+            model: wifi.detailsExpanded ? wifi.connectedInfo : []
             ColumnLayout {
                 required property var modelData
                 Layout.fillWidth: true

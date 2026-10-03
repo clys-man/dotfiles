@@ -7,7 +7,7 @@ import Quickshell.Io
 ColumnLayout {
     id: power
     required property var app
-    readonly property var connectedDevices: Bluetooth.devices.values.filter(device => device.connected && device.batteryAvailable)
+    readonly property var connectedDevices: Bluetooth.devices.values.filter(device => device.connected && device.batteryAvailable).concat(power.app.status.usbDevices || [])
     function deviceIcon(device) {
         const type = String(device.icon || "").toLowerCase();
         if (/headset|headphone|audio-card/.test(type)) return "headphones";
@@ -51,7 +51,7 @@ ColumnLayout {
         Layout.fillWidth: true
         visible: power.connectedDevices.length > 0
         spacing: 10
-        PanelLabel { text: "Bluetooth devices"; color: "#a6adc8" }
+        PanelLabel { text: "Devices"; color: "#a6adc8" }
         ScrollView {
             id: devicesScroll
             Layout.fillWidth: true

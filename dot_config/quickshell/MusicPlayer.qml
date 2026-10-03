@@ -53,11 +53,11 @@ Rectangle {
                 color: "#cdd6f4"
                 font.family: "FiraCode Nerd Font"
                 font.pixelSize: 14
-                onTextChanged: { scroll.restart(); x = 0; }
+                onTextChanged: { x = 0; if (scroll.running) scroll.restart(); }
             }
             SequentialAnimation {
                 id: scroll
-                running: music.visible && title.implicitWidth > viewport.width
+                running: music.visible && titleMouse.containsMouse && title.implicitWidth > viewport.width
                 loops: Animation.Infinite
                 PauseAnimation { duration: 2000 }
                 NumberAnimation { target: title; property: "x"; from: 0; to: Math.min(0, viewport.width - title.implicitWidth); duration: Math.max(1000, (title.implicitWidth - viewport.width) * 28) }
@@ -66,7 +66,9 @@ Rectangle {
                 onRunningChanged: { if (!running) title.x = 0; }
             }
             MouseArea {
+                id: titleMouse
                 anchors.fill: parent
+                hoverEnabled: true
                 onClicked: { if (music.player && music.player.canRaise) music.player.raise(); }
             }
         }

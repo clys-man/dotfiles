@@ -197,6 +197,13 @@ ShellRoot {
                 spacing: 5
                 BarButton { id: trayButton; visible: SystemTray.items.values.length > 0; iconName: "chevron-right"; text: String(SystemTray.items.values.length); tooltip: "System tray"; background: root.popupKind === "tray" && root.popupOwner === panel ? "#45475a" : "#313244"; onClicked: root.openPopup("tray", panel, trayButton) }
                 SystemStatus { status: root.status; onClicked: Hyprland.dispatch('hl.dsp.exec_cmd("alacritty --class btop,btop --title btop -e btop")') }
+                BarButton {
+                    visible: !!root.status.keyboard
+                    iconName: "keyboard"
+                    text: root.status.keyboard ? root.status.keyboard.layout : ""
+                    tooltip: root.status.keyboard ? root.status.keyboard.name : "Keyboard layout"
+                    onClicked: root.run(["hyprctl", "switchxkblayout", "all", "next"])
+                }
                 Rectangle {
                     implicitWidth: controls.implicitWidth + 8
                     implicitHeight: 32
@@ -206,7 +213,7 @@ ShellRoot {
                         id: controls
                         anchors.centerIn: parent
                         spacing: 0
-                        BarButton { grouped: true; id: wifiButton; iconName: root.connectedDevice && root.connectedDevice.type === DeviceType.Wired ? "ethernet" : root.connectedDevice ? "wifi" : "wifi-off"; tooltip: root.connectedNetwork ? root.connectedNetwork.name : "Network"; onClicked: root.openPopup("wifi", panel, wifiButton) }
+                        BarButton { grouped: true; id: wifiButton; iconName: root.status.vpn && root.status.vpn.length > 0 ? "shield" : root.connectedDevice && root.connectedDevice.type === DeviceType.Wired ? "ethernet" : root.connectedDevice ? "wifi" : "wifi-off"; foreground: root.status.vpn && root.status.vpn.length > 0 ? "#a6e3a1" : "#cdd6f4"; tooltip: root.status.vpn && root.status.vpn.length > 0 ? "VPN: " + root.status.vpn.join(", ") : root.connectedNetwork ? root.connectedNetwork.name : "Network"; onClicked: root.openPopup("wifi", panel, wifiButton) }
                         BarButton { grouped: true; id: bluetoothButton; iconName: Bluetooth.defaultAdapter && Bluetooth.defaultAdapter.enabled ? "bluetooth" : "bluetooth-muted"; tooltip: "Bluetooth"; onClicked: button => { if (button === Qt.RightButton && Bluetooth.defaultAdapter) Bluetooth.defaultAdapter.enabled = !Bluetooth.defaultAdapter.enabled; else root.openPopup("bluetooth", panel, bluetoothButton); } }
                         BarButton { grouped: true; id: displayButton; visible: root.status.brightness !== null && root.status.brightness !== undefined; iconName: root.status.night ? "moon" : "sun"; text: root.status.brightness + "%"; tooltip: "Brightness and display"; onClicked: root.openPopup("display", panel, displayButton); onScrolled: up => root.run(["brightnessctl", "-e4", "-n2", "set", up ? "5%+" : "5%-"]) }
                         BarButton { grouped: true; id: audioButton; implicitWidth: volumeContent.implicitWidth + 20
@@ -238,8 +245,8 @@ ShellRoot {
                             text: root.status.mic && !root.status.mic.muted ? root.status.mic.percent + "%" : ""
                             tooltip: "Microphone"
                             onClicked: button => {
-                                if (button === Qt.RightButton) root.run(["wpctl", "set-mute", "@DEFAULT_AUDIO_SOURCE@", "toggle"]);
-                                else if (button === Qt.MiddleButton) root.openPopup("audio", panel, micButton);
+                                if (button === Qt.LeftButton) root.openPopup("audio", panel, micButton);
+                                else if (button === Qt.RightButton) root.run(["wpctl", "set-mute", "@DEFAULT_AUDIO_SOURCE@", "toggle"]);
                             }
                             onScrolled: up => root.volume("@DEFAULT_AUDIO_SOURCE@", up)
                         }
